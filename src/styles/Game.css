@@ -1,0 +1,143 @@
+body {
+    padding: 0;
+    margin: 0;  
+    background-color: green;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ---------- BUTTON MENU ---------- */
+
+.menu-container {
+    display: flex;
+    align-items: center;
+    gap: 1%;
+    padding: 1%;
+    height: 5vh;
+}
+
+button {
+    max-height: 100%;
+    height: 2.5em;
+    padding: 0.8%;
+    border-radius: 1.25em;
+    text-align: center;
+    font-size: 1.1vw;
+    cursor: pointer;
+    border-width: 0;
+}
+
+.menu-container p {
+    font-size: 1.2vw;
+}
+
+.menu-container img {
+    height: 100%;
+    padding: 0;
+    margin: 0 0 0 0.5vw;
+}
+
+/* ---------- PLAYERS ---------- */
+
+.player-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap : 1%;
+    padding: 1%;
+    height: 15vh;
+}
+
+.player {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 1.5dvh;
+    text-align: center;
+    height: 100%;
+    aspect-ratio: 5 / 7 ;
+}
+
+.player p {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    font-size: 1vw;
+    height: 25%;
+}
+
+
+.player img {
+    height: 50%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+}
+
+/* ---------- GAME & DECK ---------- */
+
+.game-container {
+    height: 45vh;
+}
+
+.deck-container {
+    height: 20vh;
+}
+
+.deck-container, .game-container {
+    margin-bottom: 1%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 0.8vh;
+}
+
+.game-container img {
+    max-height: 100%;
+    border-radius: 2dvh;
+}
+
+.deck-container img {
+    cursor: pointer;
+    max-height: 100%;
+    border-radius: 0.5dvh;
+}
+
+.deck-container img:hover {
+    transition-delay: 0.5s;
+    transform: scale(4);
+}
+
+/* ---------- POPUP ---------- */
+
+.popup {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.75);
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+  
+.popup-content {
+    background-color: aliceblue;
+    color: black;
+    text-align: center;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px;
+}
+
+.popup-content h2 {
+    text-transform: uppercase;
+    margin: 20px 0 20px 0;
+}
+
+.popup-content p {
+    margin: 16px 0 16px 0;
+}

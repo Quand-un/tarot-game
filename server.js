@@ -1,14 +1,21 @@
-const Gameplay = require("./logic/gameplay.js");
+const Gameplay = require("./src/logic/gameplay.js");
+const path = require('path');
 const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server, { cors: { origin: "*" } });
 
 app.use(cors());
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 const PORT = process.env.PORT || 4000;
 

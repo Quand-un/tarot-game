@@ -7,7 +7,8 @@ import Popup from '../components/Popup';
 import io from 'socket.io-client';
 import '../styles/Game.css';
 
-const ENDPOINT = "http://localhost:4000";
+const ENDPOINT = "https://tarot-game.onrender.com";
+// const ENDPOINT = "http://localhost:5000";
 // const socket = io(ENDPOINT, { autoConnect: true });
 
 function Game() {

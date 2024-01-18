@@ -127,7 +127,7 @@ class Gameplay {
             if (takerWin) {                
                 this.folds.won.push(...this.folds.baize.map(play => play.card));
                 this.folds.score = this.calculateScore(this.folds.won);
-                console.log(`Won fold (score: ${this.folds.score}) <--`, winner);
+                // console.log(`Won fold (score: ${this.folds.score}) <--`, winner);
             }
             this.currentTurn = winner.player;
         } else {

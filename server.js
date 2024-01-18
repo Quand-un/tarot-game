@@ -27,13 +27,13 @@ const clients = [];
 io.on("connection", (socket) => {
     if (clients.length < MAX_PLAYERS) {
         clients.push({ id: socket.id, socket: socket, deckIndex: null });
-        console.log("New client connected: " + socket.id);
+        // console.log("New client connected: " + socket.id);
         
         socket.emit("getId", socket.id);
         io.emit("getPlayers", clients.map(client => client.id));   
     }
 
-    socket.on("ping", () => console.log(`Ping from ${socket.id}`));
+    // socket.on("ping", () => console.log(`Ping from ${socket.id}`)); // Dev ping function
 
     socket.on("playGame", () => { playGame(socket); });
 
@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
         const index = clients.findIndex(client => client.id === socket.id);
         if (index !== -1) { clients.splice(index, 1); }
         io.emit("players", clients.map(client => client.id));
-        console.log("Client disconnected");
+        // console.log("Client disconnected");
         socket.removeAllListeners();
     });
 });
@@ -82,7 +82,7 @@ function emitDeckToClient(client) {
 
     client.socket.emit("getDeck", decks[deckIndexAvailable]);
     client.deckIndex = deckIndexAvailable;
-    console.log(`Deck ${deckIndexAvailable} --> ${client.id}`);
+    // console.log(`Deck ${deckIndexAvailable} --> ${client.id}`);
 }
 
 // function emitDecks() {
@@ -136,7 +136,7 @@ function takeGame(socket, data) {
 }
 
 function toChien(socket, card) {
-    console.log(`Card ${card} --> chien`);
+    // console.log(`Card ${card} --> chien`);
     
     // const client = clients.find(client => client.id === socket.id);
     const client = getClientById(socket.id);
@@ -149,7 +149,7 @@ function toChien(socket, card) {
 }
 
 function playCard(socket, card) {
-    console.log(`Card ${card} --> baize`);
+    // console.log(`Card ${card} --> baize`);
     
     // const client = clients.find(client => client.id === socket.id);
     const client = getClientById(socket.id);

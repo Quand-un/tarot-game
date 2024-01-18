@@ -39,7 +39,7 @@ function Game() {
         }));
     }, []);
 
-    const ping = useCallback(() => { socket.emit("ping"); }, [socket]);
+    // const ping = useCallback(() => { socket.emit("ping"); }, [socket]);
 
     const getDeck = useCallback(() => { socket.emit("getDeck"); }, [socket]);
     
@@ -141,9 +141,9 @@ function Game() {
     return (
         <div>
             <div className="menu-container">
-                <button onClick={ping}>Ping the Server</button>
-                <button onClick={getDeck}>Get my deck</button>
+                {/* <button onClick={ping}>Ping the Server</button> */}
                 <button onClick={playGame}>Play a game</button>
+                <button onClick={getDeck}>Get my deck</button>
                 <p>{gamePhases[gamePhase]}</p>
                 <TakeOrPassMenu gamePhase={gamePhase} takeOrPass={takeOrPass} />
             </div>

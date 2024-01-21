@@ -57,7 +57,7 @@ io.on("connection", (socket) => {
 const game = new Gameplay(MIN_PLAYERS);
 
 function playGame(socket) {
-    if (clients.length === MIN_PLAYERS || clients.length === MAX_PLAYERS) {
+    // if (clients.length === MIN_PLAYERS || clients.length === MAX_PLAYERS) {
         game.reset(clients.length);
         clients.forEach(client => { client.deckIndex = null; });
         
@@ -65,7 +65,7 @@ function playGame(socket) {
         emitDecks(); // Send deck to each players
         io.emit("setPhase", 1);
         emitTurn();
-    }
+    // }
 }
 
 function emitDecks() {

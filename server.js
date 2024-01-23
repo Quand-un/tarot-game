@@ -26,18 +26,20 @@ const clients = [];
 
 io.on("connection", (socket) => {
     if (clients.length < MAX_PLAYERS) {
-        clients.push({ id: socket.id, socket: socket, deckIndex: null });
-        // console.log("New client connected: " + socket.id);
+        const pseudo = socket.handshake.query.pseudo;
         
-        socket.emit("getId", socket.id);
-        io.emit("getPlayers", clients.map(client => client.id));   
+        clients.push({ id: socket.id, socket: socket, pseudo: pseudo, deckIndex: null });
+        // console.log(`New client connected: ${socket.id} (${pseudo})`);
+        
+        socket.emit("setId", socket.id);
+        io.emit("setPlayers", clients.map(client => ({ id: client.id, pseudo: client.pseudo })));
     }
 
     // socket.on("ping", () => console.log(`Ping from ${socket.id}`)); // Dev ping function
 
     socket.on("playGame", () => { playGame(socket); });
 
-    socket.on("getDeck", () => { joinGame(socket); });
+    // socket.on("joinGame", () => { joinGame(socket); });
 
     socket.on("takeOrPass", (data) => { takeGame(socket, data); });
 
@@ -57,7 +59,7 @@ io.on("connection", (socket) => {
 const game = new Gameplay(MIN_PLAYERS);
 
 function playGame(socket) {
-    // if (clients.length === MIN_PLAYERS || clients.length === MAX_PLAYERS) {
+    if (clients.length >= MIN_PLAYERS && clients.length <= MAX_PLAYERS) {
         game.reset(clients.length);
         clients.forEach(client => { client.deckIndex = null; });
         
@@ -65,7 +67,7 @@ function playGame(socket) {
         emitDecks(); // Send deck to each players
         io.emit("setPhase", 1);
         emitTurn();
-    // }
+    }
 }
 
 function emitDecks() {
@@ -80,68 +82,47 @@ function emitDeckToClient(client) {
     const deckIndexesUsed = clients.map(client => client.deckIndex);
     const deckIndexAvailable = decks.findIndex((value, index) => !deckIndexesUsed.includes(index));
 
-    client.socket.emit("getDeck", decks[deckIndexAvailable]);
+    client.socket.emit("setDeck", decks[deckIndexAvailable]);
     client.deckIndex = deckIndexAvailable;
     // console.log(`Deck ${deckIndexAvailable} --> ${client.id}`);
 }
 
-// function emitDecks() {
-//     const decks = game.getDecks();
-//     const clientsWithoutDeck = clients.filter(client => client.deckIndex === null);
-
-//     clientsWithoutDeck.forEach(client => {
-//         const deckIndexesUsed = clients.map(client => client.deckIndex);
-//         const deckIndexAvailable = decks.findIndex((value, index) => !deckIndexesUsed.includes(index));
-
-//         client.socket.emit("getDeck", decks[deckIndexAvailable]);
-//         client.deckIndex = deckIndexAvailable;
-//         console.log(`Deck ${deckIndexAvailable} --> ${client.id}`);
-//     });
-// }
-
-function joinGame(socket) {
+/* function joinGame(socket) {
     const client = getClientById(socket.id);
 
     if (client.deckIndex === null) {
         emitDeckToClient(client);
     }
-    socket.emit("getFold", game.getFold());
+    socket.emit("setFold", game.getFold());
     socket.emit("setPhase", 3);
     if (client.deckIndex === game.getTurn()) {
-        socket.emit("isTurn", client.id);
+        socket.emit("setTurnId", client.id);
     }
-}
-
-// function joinGame(socket) {
-//     emitDecks();
-//     socket.emit("getFold", game.getFold());
-//     // const client = clients.find(client => client.id === socket.id);
-//     const client = getClientById(socket.id);
-//     if (client.deckIndex === game.getTurn()) {
-//         socket.emit("isTurn", client.id);
-//     }
-// }
+} */
 
 function takeGame(socket, data) {
-    // const deckIndex = data.isTaken ? clients.find(client => client.id === socket.id).deckIndex : null;
     const deckIndex = data.isTaken ? getClientById(socket.id).deckIndex : null;
     const newPhase = game.setTaker(deckIndex, data.king);
 
-    if (newPhase == 2) {
-        io.emit("getFold", game.getChien());
+    if (newPhase === -1) {
+        playGame(socket);
+    } else if (newPhase === 2) {
         const client = clients.find(client => client.deckIndex === game.getTaker());
+        // io.emit("getChien", { chien: game.getChien(), takerId: client.id });
+        io.emit("setFold", game.getChienAsFold());
         client.socket.emit("setChien", game.getDeck(client.deckIndex));
     }
+
+    if (data.isTaken) { io.emit("setTakerId", socket.id); }
     emitTurn();
 }
 
 function toChien(socket, card) {
     // console.log(`Card ${card} --> chien`);
     
-    // const client = clients.find(client => client.id === socket.id);
     const client = getClientById(socket.id);
     const isCompleted = game.toChien(client.deckIndex, card);
-    client.socket.emit("getDeck", game.getDeck(client.deckIndex));
+    client.socket.emit("setDeck", game.getDeck(client.deckIndex));
 
     if (isCompleted) {
         io.emit("setPhase", 3);
@@ -151,18 +132,21 @@ function toChien(socket, card) {
 function playCard(socket, card) {
     // console.log(`Card ${card} --> baize`);
     
-    // const client = clients.find(client => client.id === socket.id);
     const client = getClientById(socket.id);
     if (client.deckIndex === game.getTurn()) {
-        const validCard = game.checkPlay(client.deckIndex, card);
+        const validCard = game.checkPlay({ pseudo: client.pseudo, deckIndex: client.deckIndex }, card);
         if (validCard) {
-            socket.emit("getDeck", game.getDeck(client.deckIndex));
-            io.emit("getFold", game.getFold());
+            socket.emit("setDeck", game.getDeck(client.deckIndex));
+            io.emit("setFold", game.getFold());
             emitTurn();
 
-            const isGameOver = game.isGameOver();
-            if (isGameOver !== null) {
-                io.emit("gameOver", isGameOver);
+            if (game.isBaizeFull()) {
+                io.emit("setScore", game.getScore());
+
+                const isGameOver = game.isGameOver();
+                if (isGameOver !== null) {
+                    io.emit("setGameOver", isGameOver);
+                }
             }
         }
     }   
@@ -171,7 +155,7 @@ function playCard(socket, card) {
 function emitTurn() {
     const client = clients.find(client => client.deckIndex === game.getTurn());
     if (client) {
-        io.emit("isTurn", client.id);
+        io.emit("setTurnId", client.id);
     }
 }
 

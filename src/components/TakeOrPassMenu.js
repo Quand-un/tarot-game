@@ -20,7 +20,6 @@ export default function TakeOrPassMenu(props) {
                             <img alt={card} src={cardImages[card]} />
                         </button>
                     ))}
-
                 </>
             }
         </>

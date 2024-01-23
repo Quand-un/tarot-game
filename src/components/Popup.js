@@ -9,6 +9,7 @@ export default function Popup(props) {
         <p>Taker score: <b>{props.gameResult.score}</b></p>
         <p>Number of oudlers: <b>{props.gameResult.oudlersNb}</b></p>
       </div>
+      <button onClick={props.playGame}>Play again</button>
     </div>
   );
 };

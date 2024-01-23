@@ -104,17 +104,17 @@ class Gameplay {
         return this.folds.won.length === this.chienNb;
     }
     
-    checkPlay(deckIndex, card) {
+    checkPlay(player, card) {
         if (this.folds.baize.length >= this.playerNb) { this.folds.baize = []; } // Continue to display the last fold before a new play
 
-        if (!this.isValidCard({player: deckIndex, card: card})) { return false; }
+        if (!this.isValidCard(player.deckIndex, card)) { return false; }
         
-        this.folds.baize.push({player: deckIndex, card: card}); // Add in baize fold
+        this.folds.baize.push({player: player, card: card}); // Add in baize fold
         this.decks[this.currentTurn].removeByValue(card); // Remove from deck
 
         if (this.folds.baize.length >= this.playerNb) {
             const winner = this.getWinningCard(this.folds.baize);
-            const takerWin = winner.player == this.folds.taker || (this.playerNb === 5 && winner.player == this.folds.ally);
+            const takerWin = winner.player.deckIndex == this.folds.taker || (this.playerNb === 5 && winner.player.deckIndex == this.folds.ally);
 
             if (this.folds.baize.some(play => play.card === 0)) {
                 if (takerWin && !this.folds.hasExcuse) {
@@ -129,37 +129,37 @@ class Gameplay {
                 this.folds.score = this.calculateScore(this.folds.won);
                 // console.log(`Won fold (score: ${this.folds.score}) <--`, winner);
             }
-            this.currentTurn = winner.player;
+            this.currentTurn = winner.player.deckIndex;
         } else {
             this.nextTurn();
         }
         return true;
     }
 
-    isValidCard(newPlay) {
+    isValidCard(deckIndex, newCard) {
         let firstPlay = this.folds.baize[0]; // Get the card played by the first player
     
-        if (!firstPlay || firstPlay.card === 0 || newPlay.card === 0) { return true; } // If the new card is the first card being played or card 0, it's always valid
+        if (!firstPlay || firstPlay.card === 0 || newCard === 0) { return true; } // If the new card is the first card being played or card 0, it's always valid
     
         let firstColor = Math.floor(firstPlay.card / 100); // Determine the color of the first card
     
-        let playerDeck = this.decks[newPlay.player]; // Get the player's deck
+        let playerDeck = this.decks[deckIndex]; // Get the player's deck
         
         let bestAtout = Math.max(...this.folds.baize.filter(play => play.card >= 1 && play.card <= 21).map(play => play.card));
         
         let hasSuperiorAtout = playerDeck.some(card => card >= 1 && card <= 21 && card > bestAtout);
     
         // If the first color is 0 and the player has a superior card of the same color, they must play it
-        if (firstColor === 0 && newPlay.card < bestAtout && hasSuperiorAtout) { return false; }
+        if (firstColor === 0 && newCard < bestAtout && hasSuperiorAtout) { return false; }
 
-        let sameColor = Math.floor(newPlay.card / 100) === firstColor; // Check if the new card is the same color as the first card
+        let sameColor = Math.floor(newCard / 100) === firstColor; // Check if the new card is the same color as the first card
     
         // If the new card is the same color as the first card, it's valid
         if (sameColor) { return true; }
 
         let hasColor = playerDeck.some(card => Math.floor(card / 100) === firstColor); // Check if the player has a card of the first color in their deck
     
-        let isAtout = newPlay.card >= 1 && newPlay.card <= 21; // Check if the new card is between 1 and 21
+        let isAtout = newCard >= 1 && newCard <= 21; // Check if the new card is between 1 and 21
         
         let hasAtout = playerDeck.some(card => card >= 1 && card <= 21); // Check if the player has a card between 1 and 21 in their deck
     
@@ -167,7 +167,7 @@ class Gameplay {
         if (!hasColor) {
             if (isAtout) {  // If the new card is between 1 and 21, it's valid
                 // But if another player has already played a card between 1 and 21, the new card must be superior
-                if (newPlay.card < bestAtout && hasSuperiorAtout) { return false; }
+                if (newCard < bestAtout && hasSuperiorAtout) { return false; }
                 return true;
             }
             if (!hasAtout) { return true; } // If the player doesn't have a card between 1 and 21 in their deck, any card is valid
@@ -175,12 +175,28 @@ class Gameplay {
         return false; // If none of the above conditions are met, the play is not valid
     }    
     
-    getWinningCard(baize) {
-        let sortedBaize = [...baize].sort((a, b) => b.card - a.card);
-        let winningPlay = sortedBaize.find(play => play.card >= 1 && play.card <= 21);
+    // getWinningCard(baize) {
+    //     let sortedBaize = [...baize].sort((a, b) => b.card - a.card);
+    //     let winningPlay = sortedBaize.find(play => play.card >= 1 && play.card <= 21);
 
+    //     return winningPlay ? winningPlay : sortedBaize[0];
+    // }
+
+    getWinningCard(baize) {
+        let firstColor = Math.floor(baize[0].card / 100);
+        let sortedBaize = [...baize].sort((a, b) => b.card - a.card);
+    
+        // Check for cards between 1 and 21
+        let winningPlay = sortedBaize.find(play => play.card >= 1 && play.card <= 21);
+    
+        // If no cards between 1 and 21, check for cards of the same color as the first card
+        if (!winningPlay) {
+            winningPlay = sortedBaize.find(play => play.card >= firstColor * 100 && play.card <= (firstColor * 100) + 14);
+        }
+    
         return winningPlay ? winningPlay : sortedBaize[0];
     }
+    
     
     calculateScore(fold) {
         const points = {
@@ -205,7 +221,12 @@ class Gameplay {
     isGameOver() {
         if (!this.decks.find(deck => deck.length !== 0)) {
             const availableOudlers = [1, 21];
-            if (this.folds.hasExcuse) { availableOudlers.push(0); }
+            
+            let oudlersNb = [...this.folds.won.filter(card => availableOudlers.includes(card))].length;
+            if (this.folds.hasExcuse) { 
+                availableOudlers.push(0);
+                oudlersNb++;
+            }
             
             const scoreToWin = {
                 "0": 56,
@@ -214,10 +235,9 @@ class Gameplay {
                 "3": 36
             };
 
-            const oudlersNb = [...this.folds.won.filter(card => availableOudlers.includes(card))].length;
             return { 
-                winner: this.folds.score >= scoreToWin[oudlersNb] ? "Taker" : "Defender", 
-                oudlersNb: oudlersNb, 
+                winner: this.folds.score >= scoreToWin[oudlersNb] ? "Taker" : "Defender",
+                oudlersNb: oudlersNb,
                 score: this.folds.score
             };
         }
@@ -235,11 +255,20 @@ class Gameplay {
     getRandomIndex(max) { return Math.floor(Math.random() * max); }
     
     getTurn() { return this.currentTurn; }
+    getTaker(){ return this.folds.taker; }
+    
     getDeck(playerIndex){ return this.decks[playerIndex]; }
     getDecks(){ return this.decks; }
-    getFold(){ return this.folds.baize.map(play => play.card); }
+    
+    getChienNb(){ return this.chienNb; }
     getChien(){ return this.chien; }
-    getTaker(){ return this.folds.taker; }
+    getFoldWon(){ return this.folds.won; }
+    
+    getChienAsFold(){ return { cards: this.chien, pseudos: [] }; }
+    getFold(){ return { cards: this.folds.baize.map(play => play.card), pseudos: this.folds.baize.map(play => play.player.pseudo) }; }
+    
+    isBaizeFull(){ return this.folds.baize.length >= this.playerNb; }
+    getScore(){ return this.folds.score; }
 }
 
 Array.prototype.removeByIndex = function (index) {

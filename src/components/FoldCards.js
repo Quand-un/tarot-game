@@ -1,25 +1,6 @@
 import React from 'react';
 import '../styles/Game.css';
 
-// export default function FoldCards(props) {
-//     const style = {
-//         maxWidth: `calc(85% / ${props.fold.length})`,
-//     };
-
-//     return (
-//         <div className="game-container">
-//             {props.fold.map((card, index) => (
-//                 <img 
-//                     key={index} 
-//                     alt={card} 
-//                     src={require(`../images/cards/${card}.jpg`)} 
-//                     style={style}
-//                 />
-//             ))}
-//         </div>
-//     );
-// };
-
 export default function FoldCards(props) {
     const style = {
         maxWidth: `calc(85% / ${props.fold.length})`,
@@ -32,13 +13,14 @@ export default function FoldCards(props) {
 
     return (
         <div className="game-container">
-            {props.fold.map((card) => (
-                <img 
-                    key={card} 
-                    alt={card} 
-                    src={cardImages[card]} 
-                    style={style}
-                />
+            {props.fold.map((card, index) => (
+                <div key={card} className="card-container" style={style}>
+                    <img 
+                        alt={card} 
+                        src={cardImages[card]} 
+                    />
+                    {props.pseudos.length > 0 && <p>{props.pseudos[index]}</p>}
+                </div>
             ))}
         </div>
     );

@@ -1,26 +1,6 @@
 import React from 'react';
 import '../styles/Game.css';
 
-// export default function DeckCards(props) {
-//     const style = {
-//         maxWidth: `calc(85% / ${props.deck.length})`,
-//     };
-
-//     return (
-//         <div className="deck-container">
-//             {props.deck.map((card, index) => (
-//                 <img 
-//                     key={index} 
-//                     alt={card} 
-//                     src={require(`../images/cards/${card}.jpg`)} 
-//                     onClick={() => props.playCard(card)} 
-//                     style={style}
-//                 />
-//             ))}
-//         </div>
-//     );
-// };
-
 export default function DeckCards(props) {
     const style = {
         maxWidth: `calc(85% / ${props.deck.length})`,

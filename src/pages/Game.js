@@ -1,19 +1,20 @@
 import React, { useEffect , useState, useCallback } from 'react';
+import Header from '../components/Header';
 import TakeOrPassMenu from '../components/TakeOrPassMenu';
 import PlayerCard from '../components/PlayerCards';
 import DeckCards from '../components/DeckCards';
 import FoldCards from '../components/FoldCards';
 import Popup from '../components/Popup';
+import { generatePseudo } from '../logic/pseudoGenerator';
 import io from 'socket.io-client';
 import '../styles/Game.css';
 
-const ENDPOINT = "https://tarot-game.onrender.com";
-// const ENDPOINT = "http://localhost:5000";
-// const socket = io(ENDPOINT, { autoConnect: true });
+// const ENDPOINT = "https://tarot-game.onrender.com";
+const ENDPOINT = "http://localhost:5000";
 
 function Game() {
     const gamePhases = {
-        "-1": 'Waiting for next step...',
+        "-1": 'Waiting for the chien...',
         "1": 'Take or pass ?',
         "2": 'Making your chien...',
         "3": 'Game start !',
@@ -21,16 +22,28 @@ function Game() {
     };
 
     const [socket, setSocket] = useState(null);
-    const [id, setId] = useState('');
+    const [pseudo, setPseudo] = useState(generatePseudo());
+    const [myId, setMyId] = useState('');
     const [players, setPlayers] = useState([]);
     const [gamePhase, setGamePhase] = useState(0);
-    const [gameState, setGameState] = useState({
-        deck: [],
-        fold: []
-    });
-    const [isTurn, setIsTurn] = useState(false);
-    const [gameResult, setGameResult] = useState({});
-    
+    const [deck, setDeck] = useState([]);
+    const [fold, setFold] = useState({ cards: [], pseudos: [] });
+    const [turnId, setTurnId] = useState('');
+    const [gameResult, setGameResult] = useState({ winner: '', score: 0, oudlersNb: 0 });
+    const [takerId, setTakerId] = useState('');
+    const [join, setJoin] = useState(false);
+
+    const sendPseudo = useCallback((e) => {    
+        if (e.key === 'Enter' && !join) {
+            setJoin(true);
+        }
+    }, [join]);
+
+    const updatePseudo = useCallback((e) => {    
+        if (!join && e.target.value.length <= 8) {
+            setPseudo(e.target.value);
+        }
+    }, [join]);
 
     const updateState = useCallback((stateFunction, updates) => {
         stateFunction((prevState) => ({
@@ -40,117 +53,94 @@ function Game() {
     }, []);
 
     // const ping = useCallback(() => { socket.emit("ping"); }, [socket]);
-
-    const getDeck = useCallback(() => { socket.emit("getDeck"); }, [socket]);
     
-    const playGame = useCallback(() => { socket.emit("playGame"); }, [socket]);
+    const isMyTurn = useCallback(() => { return turnId === myId; }, [turnId, myId]);
+
+    // const joinGame = useCallback(() => { socket.emit("joinGame"); }, [socket]);
+    
+    const playGame = useCallback(() => { 
+        socket.emit("playGame");
+        setFold({ cards: [], pseudos: [] });
+    }, [socket]);
 
     const takeOrPass = useCallback((isTaken, card) => {
-        if (gamePhase === 1 && isTurn) {
+        if (gamePhase === 1 && isMyTurn) {
             socket.emit("takeOrPass", { isTaken: isTaken, king: card });
             setGamePhase(-1);
         }
-    }, [gamePhase, isTurn, socket]);
+    }, [gamePhase, isMyTurn, socket]);
 
     const playCard = (cardValue) => {
-        if (gamePhase === 3 && isTurn) {
+        if (gamePhase === 3 && isMyTurn) {
             socket.emit("playCard", cardValue);
         } else if (gamePhase === 2) {
             socket.emit("toChien", cardValue);
         }
     };
 
-    // useEffect(() => {
-    //     socket.on("getId", (id) => {
-    //         setId(id);
-    //     });
-
-    //     socket.on("getPlayers", (clientIds) => {
-    //         setPlayers(clientIds);
-    //     });
-
-    //     socket.on("setPhase", (phaseNb) => {
-    //         setGamePhase(phaseNb);
-    //     })
-
-    //     socket.on("getDeck", (deck) => {
-    //         if (deck) {
-    //             updateState(setGameState, { deck: deck });
-    //         }
-    //     });
-
-    //     socket.on("setChien", (deck) => {
-    //         if (deck) {
-    //             updateState(setGameState, { deck: deck });
-    //             setGamePhase(2);
-    //         }
-    //     });
-
-    //     socket.on("getFold", (fold) => {
-    //         updateState(setGameState, { fold: fold });
-    //     })
-
-    //     socket.on("isTurn", (clientId) => {
-    //         id === clientId ? setIsTurn(true) : setIsTurn(false);
-    //     });
-
-    //     socket.on("gameOver", (data) => {
-    //         setGameResult(data);
-    //         setGamePhase(4);
-    //     });
-    
-    //     // return () => {
-    //     // //   socket.disconnect();
-    //     // };
-    //   }, [updateState, id]);
-
     useEffect(() => {
-        const newSocket = io(ENDPOINT, { autoConnect: true });
-        setSocket(newSocket);
-        return () => newSocket.disconnect();
-    }, []);
+        if (join) {
+            const newSocket = io(ENDPOINT, { 
+                autoConnect: true,
+                query: { pseudo: pseudo }
+            });
+            setSocket(newSocket);
+            return () => newSocket.disconnect();
+        }
+    }, [join, pseudo]);
 
     useEffect(() => {
         if (!socket) return;
-        socket.on("getId", setId); // <=> socket.on("getId", (id) => { setId(id); });
-        socket.on("getPlayers", setPlayers);
+        socket.on("setId", setMyId); // <=> socket.on("getId", (id) => { setId(id); });
+        socket.on("setPlayers", setPlayers);
         socket.on("setPhase", setGamePhase);
-        socket.on("getDeck", (deck) => updateState(setGameState, { deck: deck }));
+        socket.on("setDeck", (deck) => setDeck(deck));
+        socket.on("setTurnId", setTurnId);
+        socket.on("setTakerId", setTakerId);
         socket.on("setChien", (deck) => {
-            updateState(setGameState, { deck: deck });
+            setDeck(deck);
             setGamePhase(2);
         });
-        socket.on("getFold", (fold) => updateState(setGameState, { fold: fold }));
-        socket.on("isTurn", (clientId) => setIsTurn(id === clientId));
-        socket.on("gameOver", (data) => {
+        socket.on("setFold", (data) => setFold(data));
+        socket.on("setScore", (score) => updateState(setGameResult, { score: score }));
+        socket.on("setGameOver", (data) => {
             setGameResult(data);
             setGamePhase(4);
         });
         return () => {
-            socket.off("getId");
-            socket.off("getPlayers");
+            socket.off("setId");
+            socket.off("setPlayers");
             socket.off("setPhase");
-            socket.off("getDeck");
+            socket.off("setDeck");
+            socket.off("setTurnId");
+            socket.off("setTakerId");
             socket.off("setChien");
-            socket.off("getFold");
-            socket.off("isTurn");
-            socket.off("gameOver");
+            socket.off("setFold");
+            socket.off("setScore");
+            socket.off("setGameOver");
         };
-    }, [socket, id, updateState]);    
+    }, [socket, myId, updateState]);    
 
     return (
         <div>
             <div className="menu-container">
-                {/* <button onClick={ping}>Ping the Server</button> */}
-                <button onClick={playGame}>Play a game</button>
-                <button onClick={getDeck}>Get my deck</button>
-                <p>{gamePhases[gamePhase]}</p>
+                <Header 
+                    gamePhases={gamePhases}
+                    gamePhase={gamePhase}
+                    join={join}
+                    score={gameResult.score}
+                    updatePseudo={updatePseudo}
+                    sendPseudo={sendPseudo}
+                    setJoin={() => {setJoin(true)}}
+                    playGame={playGame}
+                    // joinGame={joinGame}
+                />
                 <TakeOrPassMenu gamePhase={gamePhase} takeOrPass={takeOrPass} />
             </div>
-            <PlayerCard id={id} players={players} isTurn={isTurn} />
-            <FoldCards fold={gameState.fold} />
-            <DeckCards deck={gameState.deck} playCard={playCard} />
-            {gamePhase === 4 && <Popup gameResult={gameResult} />}
+            <PlayerCard myId={myId} players={players} turnId={turnId} takerId={takerId} />
+            <FoldCards fold={fold.cards} pseudos={fold.pseudos} />            
+            <DeckCards deck={deck} playCard={playCard} />
+            {gamePhase === 4 && <Popup gameResult={gameResult} playGame={playGame} />}
         </div>
     );
 }

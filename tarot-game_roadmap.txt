@@ -18,4 +18,4 @@ In progress:
 - [ ] Take small, guard
 - [ ] Show who takes what
 - [ ] "Join current game" button in maintenance
-- [ ] Highligh valid cards
+- [ ] Highlight valid cards

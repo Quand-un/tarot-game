@@ -1,0 +1,21 @@
+Fixed:
+- [X] Add nicknames
+- [X] 4-player Tarot
+- [X] Real-time points
+- [X] Excuse not counted (for oudlersNb)
+- [X] "Play" anti-spam
+- [X] Faster zoom, smaller size
+- [X] Show everyone whose turn it is
+- [X] Implement everyone passes
+- [X] Close gameover menu
+- [X] Same size cards
+- [X] Know who plays what
+- [X] Show who took
+- [X] Heart queen bug (best card bug with wrong color)
+
+In progress:
+- [ ] Spectator mode
+- [ ] Take small, guard
+- [ ] Show who takes what
+- [ ] "Join current game" button in maintenance
+- [ ] Highligh valid cards

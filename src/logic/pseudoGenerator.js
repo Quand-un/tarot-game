@@ -11,7 +11,9 @@ export function generatePseudo() {
         "Retro",
         "Le stylé",
         "Noob",
-        "Killer"
+        "Killer",
+        "Batman",
+        "Zero"
     ];
     
     return pseudos[Math.floor(Math.random() * pseudos.length)];;

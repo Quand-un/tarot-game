@@ -136,7 +136,8 @@ class Gameplay {
         return true;
     }
 
-    isValidCard(deckIndex, newCard) {
+    // Previous version
+    /* isValidCard(deckIndex, newCard) {
         let firstPlay = this.folds.baize[0]; // Get the card played by the first player
     
         if (!firstPlay || firstPlay.card === 0 || newCard === 0) { return true; } // If the new card is the first card being played or card 0, it's always valid
@@ -173,14 +174,48 @@ class Gameplay {
             if (!hasAtout) { return true; } // If the player doesn't have a card between 1 and 21 in their deck, any card is valid
         }
         return false; // If none of the above conditions are met, the play is not valid
-    }    
-    
-    // getWinningCard(baize) {
-    //     let sortedBaize = [...baize].sort((a, b) => b.card - a.card);
-    //     let winningPlay = sortedBaize.find(play => play.card >= 1 && play.card <= 21);
+    } */ 
 
-    //     return winningPlay ? winningPlay : sortedBaize[0];
-    // }
+    isValidCard(deckIndex, newCard) {
+        const firstPlay = this.folds.baize[0]; // Get the card played by the first player
+    
+        if (!firstPlay || firstPlay.card === 0 || newCard === 0) { return true; } // If the new card is the first card being played or card 0, it's always valid
+    
+        return this.getValidCards(firstPlay, deckIndex).includes(newCard); // Return if the card played is part of all valid cards
+    }
+
+    getValidCards(firstPlay, deckIndex) {
+        const firstColor = Math.floor(firstPlay.card / 100); // Determine the color of the first card
+    
+        const playerDeck = this.decks[deckIndex]; // Get the player's deck
+    
+        const bestAtout = Math.max(...this.folds.baize.filter(play => play.card >= 1 && play.card <= 21).map(play => play.card));
+    
+        const hasSuperiorAtout = playerDeck.some(card => card >= 1 && card <= 21 && card > bestAtout);
+    
+        const validCards = playerDeck.filter(card => {
+            const sameColor = Math.floor(card / 100) === firstColor; // Check if the card is the same color as the first card
+            const isAtout = card >= 1 && card <= 21; // Check if the card is between 1 and 21
+            const hasColor = playerDeck.some(card => Math.floor(card / 100) === firstColor); // Check if the player has a card of the first color in their deck
+            const hasAtout = playerDeck.some(card => card >= 1 && card <= 21); // Check if the player has a card between 1 and 21 in their deck
+    
+            if (!sameColor && hasColor) { return false; } // You can't play another color card if you have the color asked
+            if (!sameColor && !isAtout && hasAtout) { return false; } // You can't play another color card if you have at least one atout
+            if (card < bestAtout && hasSuperiorAtout) { return false; } // You can't play atout < the best atout if you have a better one
+    
+            return true; // If all conditions are passed, return true
+        });
+    
+        return validCards;
+    }
+
+    // Previous version
+    /* getWinningCard(baize) {
+        let sortedBaize = [...baize].sort((a, b) => b.card - a.card);
+        let winningPlay = sortedBaize.find(play => play.card >= 1 && play.card <= 21);
+
+        return winningPlay ? winningPlay : sortedBaize[0];
+    } */
 
     getWinningCard(baize) {
         let firstColor = Math.floor(baize[0].card / 100);
@@ -196,7 +231,6 @@ class Gameplay {
     
         return winningPlay ? winningPlay : sortedBaize[0];
     }
-    
     
     calculateScore(fold) {
         const points = {

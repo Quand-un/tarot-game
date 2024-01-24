@@ -9,8 +9,8 @@ import { generatePseudo } from '../logic/pseudoGenerator';
 import io from 'socket.io-client';
 import '../styles/Game.css';
 
-const ENDPOINT = "https://tarot-game.onrender.com";
-// const ENDPOINT = "http://localhost:5000";
+// const ENDPOINT = "https://tarot-game.onrender.com";
+const ENDPOINT = "http://localhost:5000";
 
 function Game() {
     const gamePhases = {
@@ -60,7 +60,6 @@ function Game() {
     
     const playGame = useCallback(() => { 
         socket.emit("playGame");
-        setFold({ cards: [], pseudos: [] });
     }, [socket]);
 
     const takeOrPass = useCallback((isTaken, card) => {
@@ -93,7 +92,13 @@ function Game() {
         if (!socket) return;
         socket.on("setId", setMyId); // <=> socket.on("getId", (id) => { setId(id); });
         socket.on("setPlayers", setPlayers);
-        socket.on("setPhase", setGamePhase);
+        socket.on("setPhase", (phase) => {
+            setGamePhase(phase);
+            if (phase === 1) {
+                setFold({ cards: [], pseudos: [] });
+                setGameResult({ winner: '', score: 0, oudlersNb: 0 });
+            }
+        });
         socket.on("setDeck", (deck) => setDeck(deck));
         socket.on("setTurnId", setTurnId);
         socket.on("setTakerId", setTakerId);

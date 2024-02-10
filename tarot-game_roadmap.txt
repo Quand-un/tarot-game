@@ -19,3 +19,7 @@ In progress:
 - [ ] Show who takes what
 - [ ] "Join current game" button in maintenance
 - [ ] Highlight valid cards
+- [ ] Your turn sound
+- [ ] Show last fold
+- [ ] Point counter issue
+- [ ] Restart game issue + "Your Turn" issue + Can pass but not your turn

@@ -13,13 +13,16 @@ Fixed:
 - [X] Show who took
 - [X] Heart queen bug (best card bug with wrong color)
 
+Fixed (11/02/2024):
+- [X] Point counter issue
+- [X] "Your Turn" issue + Can pass but not your turn
+- [X] Restart game issue
+- [X] Your turn sound
+
 In progress:
 - [ ] Spectator mode
 - [ ] Take small, guard
 - [ ] Show who takes what
 - [ ] "Join current game" button in maintenance
 - [ ] Highlight valid cards
-- [ ] Your turn sound
 - [ ] Show last fold
-- [ ] Point counter issue
-- [ ] Restart game issue + "Your Turn" issue + Can pass but not your turn

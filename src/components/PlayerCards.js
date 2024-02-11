@@ -1,5 +1,5 @@
-import user from '../images/user.png'; // <a href="https://www.flaticon.com/fr/icones-gratuites/nom-dutilisateur" title="nom d'utilisateur icônes">Nom d'utilisateur icônes créées par Icon Mela - Flaticon</a>
-import taker from '../images/taker.png'; // <a href="https://www.flaticon.com/fr/icones-gratuites/couronne" title="couronne icônes">Couronne icônes créées par Freepik - Flaticon</a>
+import user from '../assets/images/user.png'; // <a href="https://www.flaticon.com/fr/icones-gratuites/nom-dutilisateur" title="nom d'utilisateur icônes">Nom d'utilisateur icônes créées par Icon Mela - Flaticon</a>
+import taker from '../assets/images/taker.png'; // <a href="https://www.flaticon.com/fr/icones-gratuites/couronne" title="couronne icônes">Couronne icônes créées par Freepik - Flaticon</a>
 import React from 'react';
 import '../styles/Game.css';
 

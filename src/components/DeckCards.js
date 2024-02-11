@@ -7,7 +7,7 @@ export default function DeckCards(props) {
     };
 
     const cardImages = props.deck.reduce((images, card) => {
-        images[card] = require(`../images/cards/${card}.jpg`);
+        images[card] = require(`../assets/images/cards/${card}.jpg`);
         return images;
     }, {});
 

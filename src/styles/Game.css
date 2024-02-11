@@ -1,7 +1,7 @@
 body {
     padding: 0;
     margin: 0;  
-    background-color: green;
+    background-color: #064E24;
     font-family: 'Poppins', sans-serif;
 }
 
@@ -13,6 +13,10 @@ body {
     gap: 1%;
     padding: 1%;
     height: 5vh;
+}
+
+.menu-container p {
+    color: white;
 }
 
 button {

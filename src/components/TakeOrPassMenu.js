@@ -3,10 +3,10 @@ import '../styles/Game.css';
 
 export default function TakeOrPassMenu(props) {
     const cardImages = {
-        114: require(`../images/114.png`),
-        214: require(`../images/214.png`),
-        314: require(`../images/314.png`),
-        414: require(`../images/414.png`),
+        114: require(`../assets/images/114.png`),
+        214: require(`../assets/images/214.png`),
+        314: require(`../assets/images/314.png`),
+        414: require(`../assets/images/414.png`),
     };
     
     return (

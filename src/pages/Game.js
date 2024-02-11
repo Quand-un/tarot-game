@@ -1,4 +1,5 @@
 import React, { useEffect , useState, useCallback } from 'react';
+import useSound from 'use-sound';
 import Header from '../components/Header';
 import TakeOrPassMenu from '../components/TakeOrPassMenu';
 import PlayerCard from '../components/PlayerCards';
@@ -8,15 +9,16 @@ import Popup from '../components/Popup';
 import { generatePseudo } from '../logic/pseudoGenerator';
 import io from 'socket.io-client';
 import '../styles/Game.css';
+import turnSound from '../assets/sounds/turnSound.mp3';
 
 const ENDPOINT = "https://tarot-game.onrender.com";
 // const ENDPOINT = "http://localhost:5000";
 
 function Game() {
     const gamePhases = {
-        "-1": 'Waiting for the chien...',
+        "-1": 'Waiting for the dog...',
         "1": 'Take or pass ?',
-        "2": 'Making your chien...',
+        "2": 'Making your dog...',
         "3": 'Game start !',
         "4": 'Game over !'
     };
@@ -32,6 +34,8 @@ function Game() {
     const [gameResult, setGameResult] = useState({ winner: '', score: 0, oudlersNb: 0 });
     const [takerId, setTakerId] = useState('');
     const [join, setJoin] = useState(false);
+
+    const [playTurnSound] = useSound(turnSound);
 
     const sendPseudo = useCallback((e) => {    
         if (e.key === 'Enter' && !join) {
@@ -63,14 +67,14 @@ function Game() {
     }, [socket]);
 
     const takeOrPass = useCallback((isTaken, card) => {
-        if (gamePhase === 1 && isMyTurn) {
+        if (gamePhase === 1 && isMyTurn()) {
             socket.emit("takeOrPass", { isTaken: isTaken, king: card });
             setGamePhase(-1);
         }
     }, [gamePhase, isMyTurn, socket]);
 
     const playCard = (cardValue) => {
-        if (gamePhase === 3 && isMyTurn) {
+        if (gamePhase === 3 && isMyTurn()) {
             socket.emit("playCard", cardValue);
         } else if (gamePhase === 2) {
             socket.emit("toChien", cardValue);
@@ -97,10 +101,15 @@ function Game() {
             if (phase === 1) {
                 setFold({ cards: [], pseudos: [] });
                 setGameResult({ winner: '', score: 0, oudlersNb: 0 });
+                setTakerId('');
             }
         });
         socket.on("setDeck", (deck) => setDeck(deck));
-        socket.on("setTurnId", setTurnId);
+        // socket.on("setTurnId", setTurnId);
+        socket.on("setTurnId", (turnId) => {
+            setTurnId(turnId);
+            if (turnId === myId) { playTurnSound(); }
+        });
         socket.on("setTakerId", setTakerId);
         socket.on("setChien", (deck) => {
             setDeck(deck);
@@ -124,7 +133,7 @@ function Game() {
             socket.off("setScore");
             socket.off("setGameOver");
         };
-    }, [socket, myId, updateState]);    
+    }, [socket, myId, updateState, playTurnSound]);    
 
     return (
         <div>

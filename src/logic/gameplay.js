@@ -116,13 +116,13 @@ class Gameplay {
             const winner = this.getWinningCard(this.folds.baize);
             const takerWin = winner.player.deckIndex == this.folds.taker || (this.playerNb === 5 && winner.player.deckIndex == this.folds.ally);
 
-            if (this.folds.baize.some(play => play.card === 0)) {
-                if (takerWin && !this.folds.hasExcuse) {
-                    this.folds.score -= 4;
-                } else if (!takerWin && this.folds.hasExcuse) {
-                    this.folds.score += 4;
-                }
-            }
+            // if (this.folds.baize.some(play => play.card === 0)) {
+            //     if (takerWin && !this.folds.hasExcuse) {
+            //         this.folds.score -= 4;
+            //     } else if (!takerWin && this.folds.hasExcuse) {
+            //         this.folds.score += 4;
+            //     }
+            // }
             
             if (takerWin) {                
                 this.folds.won.push(...this.folds.baize.map(play => play.card));
@@ -234,7 +234,7 @@ class Gameplay {
     
     calculateScore(fold) {
         const points = {
-            0: 4.5, 1: 4.5, 21: 4.5,
+            1: 4.5, 21: 4.5,
             111: 1.5, 211: 1.5, 311: 1.5, 411: 1.5,
             112: 2.5, 212: 2.5, 312: 2.5, 412: 2.5,
             113: 3.5, 213: 3.5, 313: 3.5, 413: 3.5,
@@ -245,9 +245,14 @@ class Gameplay {
         for (let card of fold) {
             if (points.hasOwnProperty(card)) {
                 score += points[card];
-            } else if ((card >= 2 && card <= 20) || ((card - 1) % 100 >= 0 && (card - 1) % 100 <= 9)) {
+            } else if (card == 0) {
+                this.folds.hasExcuse ? score += 4.5 : score += 0.5;
+            } else {
                 score += 0.5;
             }
+            // } else if ((card >= 2 && card <= 20) || ((card - 1) % 100 >= 0 && (card - 1) % 100 <= 9)) {
+            //     score += 0.5;
+            // }
         }
         return score;
     }
@@ -256,11 +261,11 @@ class Gameplay {
         if (!this.decks.find(deck => deck.length !== 0)) {
             const availableOudlers = [1, 21];
             
-            let oudlersNb = [...this.folds.won.filter(card => availableOudlers.includes(card))].length;
             if (this.folds.hasExcuse) { 
                 availableOudlers.push(0);
-                oudlersNb++;
+                // oudlersNb++;
             }
+            let oudlersNb = [...this.folds.won.filter(card => availableOudlers.includes(card))].length;
             
             const scoreToWin = {
                 "0": 56,

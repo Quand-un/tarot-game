@@ -13,7 +13,7 @@ export default function TakeOrPassMenu(props) {
         <>
             {props.gamePhase === 1 && 
                 <>
-                    <button onClick={() => props.takeOrPass(false)}>Pass</button>
+                    <button onClick={() => props.takeOrPass(false, null)}>Pass</button>
                     {[114, 214, 314, 414].map((card) => (
                         <button key={card} onClick={() => props.takeOrPass(true, card)}>
                             Take

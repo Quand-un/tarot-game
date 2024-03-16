@@ -12,12 +12,16 @@ Fixed:
 - [X] Know who plays what
 - [X] Show who took
 - [X] Heart queen bug (best card bug with wrong color)
-
-Fixed (11/02/2024):
 - [X] Point counter issue
 - [X] "Your Turn" issue + Can pass but not your turn
 - [X] Restart game issue
 - [X] Your turn sound
+
+Fixed (16/03/2024):
+- [X] Score issue
+- [X] Partner score not take in account
+- [X] Excuse issue if fold lose
+- [X] Issue if first color is Excuse
 
 In progress:
 - [ ] Spectator mode
@@ -26,3 +30,5 @@ In progress:
 - [ ] "Join current game" button in maintenance
 - [ ] Highlight valid cards
 - [ ] Show last fold
+- [ ] Can't play first, color taken
+- [ ] Change beginner after each game

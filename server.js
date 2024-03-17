@@ -61,7 +61,7 @@ const game = new Gameplay(MIN_PLAYERS);
 function playGame(socket) {
     if (clients.length >= MIN_PLAYERS && clients.length <= MAX_PLAYERS) {
         game.reset(clients.length);
-        clients.forEach(client => { client.deckIndex = null; });
+        clients.forEach(client => client.deckIndex = null);
         
         game.start(clients.findIndex(client => client.id === socket.id)); // Shuffle + distribute cards + initiate currentTurn
         emitDecks(); // Send deck to each players

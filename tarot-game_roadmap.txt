@@ -22,6 +22,7 @@ Fixed (16/03/2024):
 - [X] Partner score not take in account
 - [X] Excuse issue if fold lose
 - [X] Issue if first color is Excuse
+- [X] Can't play first, color taken
 
 In progress:
 - [ ] Spectator mode
@@ -30,5 +31,4 @@ In progress:
 - [ ] "Join current game" button in maintenance
 - [ ] Highlight valid cards
 - [ ] Show last fold
-- [ ] Can't play first, color taken
 - [ ] Change beginner after each game

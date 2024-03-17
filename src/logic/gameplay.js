@@ -16,6 +16,7 @@ class Gameplay {
 
         this.decks = Array.from({ length: this.playerNb }, () => []);
         this.chien = [];
+        this.kingCalled = null;
         this.game = {
             fold: [],
             takers: [],
@@ -69,8 +70,9 @@ class Gameplay {
     }
 
     setTaker(deckIndex, king) {
-        if (deckIndex !== null) {
+        if (deckIndex !== null && king !== null) {
             this.game.takers = [deckIndex];
+            this.kingCalled = this.playerNb === 5 ? king : null;
         }
     
         if (this.totalTurn === this.playerNb) {
@@ -82,8 +84,8 @@ class Gameplay {
                 takerDeck.push(...this.chien);
                 this.sortDeck(takerDeck);
     
-                if (this.playerNb === 5 && king !== null) {
-                    const allyDeck = this.decks.findIndex(deck => deck.includes(king));
+                if (this.playerNb === 5 && this.kingCalled !== null) {
+                    const allyDeck = this.decks.findIndex(deck => deck.includes(this.kingCalled));
                     if (!this.game.takers.includes(allyDeck)) {
                         this.game.takers.push(allyDeck);
                     }
@@ -128,7 +130,6 @@ class Gameplay {
                 }
             }
             
-
             if (takerWin) {
                 this.game.won.push(...this.game.fold.map(play => play.card));
             }
@@ -144,14 +145,16 @@ class Gameplay {
 
     isValidCard(deckIndex, newCard) {
         const firstPlay = this.game.fold[0]; // Get the card played by the first player
+
+        if (this.kingCalled && this.totalTurn === this.playerNb + 1 && this.getColor(newCard) === this.getColor(this.kingCalled)) { return false }
     
         if (!firstPlay || firstPlay.card === 0 || newCard === 0) { return true; } // If the new card is the first card being played or card 0, it's always valid
-    
+        
         return this.getValidCards(firstPlay, deckIndex).includes(newCard); // Return if the card played is part of all valid cards
     }
 
     getValidCards(firstPlay, deckIndex) {
-        const firstColor = Math.floor(firstPlay.card / 100); // Determine the color of the first card
+        const firstColor = this.getColor(firstPlay.card); // Determine the color of the first card
     
         const playerDeck = this.decks[deckIndex]; // Get the player's deck
     
@@ -160,9 +163,9 @@ class Gameplay {
         const hasSuperiorAtout = playerDeck.some(card => card >= 1 && card <= 21 && card > bestAtout);
     
         const validCards = playerDeck.filter(card => {
-            const sameColor = Math.floor(card / 100) === firstColor; // Check if the card is the same color as the first card
+            const sameColor = this.getColor(card) === firstColor; // Check if the card is the same color as the first card
             const isAtout = card >= 1 && card <= 21; // Check if the card is between 1 and 21
-            const hasColor = playerDeck.some(card => Math.floor(card / 100) === firstColor); // Check if the player has a card of the first color in their deck
+            const hasColor = playerDeck.some(card => this.getColor(card) === firstColor); // Check if the player has a card of the first color in their deck
             const hasAtout = playerDeck.some(card => card >= 1 && card <= 21); // Check if the player has a card between 1 and 21 in their deck
     
             if (!sameColor && hasColor) { return false; } // You can't play another color card if you have the color asked
@@ -176,7 +179,7 @@ class Gameplay {
     }
 
     getWinningCard(baize) {
-        let firstColor = Math.floor((baize.find(play => play.card != 0).card ?? 0)/ 100);
+        let firstColor = this.getColor(baize.find(play => play.card != 0).card ?? 0);
         let sortedBaize = [...baize].sort((a, b) => b.card - a.card);
     
         // Check for cards between 1 and 21
@@ -238,6 +241,7 @@ class Gameplay {
 
     sortDeck(deck) { return deck.sort((a, b) => a - b); }
     
+    getColor(card) { return Math.floor(card / 100); }
     getRandomIndex(max) { return Math.floor(Math.random() * max); }
     
     getTurn() { return this.currentTurn; }

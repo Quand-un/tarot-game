@@ -9,7 +9,7 @@ import Popup from '../components/Popup';
 import { generatePseudo } from '../logic/pseudoGenerator';
 import io from 'socket.io-client';
 import '../styles/Game.css';
-import turnSound from '../assets/sounds/uwu.mp3';
+import turnSound from '../assets/sounds/turnSound.mp3';
 
 const ENDPOINT = "https://tarot-game.onrender.com";
 // const ENDPOINT = "http://localhost:5000";

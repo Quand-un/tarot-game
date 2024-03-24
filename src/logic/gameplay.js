@@ -121,18 +121,15 @@ class Gameplay {
             const takerWin = this.game.takers.includes(deckIndex);
 
             if (this.game.fold.some(play => play.card === 0)) {
-                if (this.game.hasExcuse) {
-                    if (!takerWin) {
-                        this.game.won.push(0);
-                    }
+                if (this.game.hasExcuse && !takerWin) {
+                    this.game.won.push(0);
                 } else if (takerWin) {
-                    this.game.fold = this.game.fold.filter(play => play.card !== 0);
+                    this.game.won.push(...this.game.fold.filter(play => play.card !== 0).map(play => play.card));
                 }
-            }
-            
-            if (takerWin) {
+            } else if (takerWin) {
                 this.game.won.push(...this.game.fold.map(play => play.card));
             }
+
             this.game.score = this.calculateScore(this.game.won);
             // console.log(`Won fold (score: ${this.folds.score}) <--`, winner);
 
@@ -193,7 +190,7 @@ class Gameplay {
         return winningPlay ? winningPlay : sortedBaize[0];
     }
     
-    calculateScore(folds) {
+    calculateScore(wonFolds) {
         const points = {
             0: 4.5, 1: 4.5, 21: 4.5,
             111: 1.5, 211: 1.5, 311: 1.5, 411: 1.5,
@@ -203,7 +200,7 @@ class Gameplay {
         };
     
         let score = 0;
-        for (let card of folds) {
+        for (let card of wonFolds) {
             if (points.hasOwnProperty(card)) {
                 score += points[card];
             } else {

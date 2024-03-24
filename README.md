@@ -1,40 +1,40 @@
 # Tarot Game Roadmap
 
 Fixed:
-[X] Add nicknames
-[X] 4-player Tarot
-[X] Real-time points
-[X] Excuse not counted (for oudlersNb)
-[X] "Play" anti-spam
-[X] Faster zoom, smaller size
-[X] Show everyone whose turn it is
-[X] Implement everyone passes
-[X] Close gameover menu
-[X] Same size cards
-[X] Know who plays what
-[X] Show who took
-[X] Heart queen bug (best card bug with wrong color)
-[X] Point counter issue
-[X] "Your Turn" issue + Can pass but not your turn
-[X] Restart game issue
-[X] Your turn sound
-[X] Score issue
-[X] Partner score not take in account
-[X] Excuse issue if fold lose
-[X] Issue if first color is Excuse
-[X] Can't play first, color taken
+- [X] Add nicknames
+- [X] 4-player Tarot
+- [X] Real-time points
+- [X] Excuse not counted (for oudlersNb)
+- [X] "Play" anti-spam
+- [X] Faster zoom, smaller size
+- [X] Show everyone whose turn it is
+- [X] Implement everyone passes
+- [X] Close gameover menu
+- [X] Same size cards
+- [X] Know who plays what
+- [X] Show who took
+- [X] Heart queen bug (best card bug with wrong color)
+- [X] Point counter issue
+- [X] "Your Turn" issue + Can pass but not your turn
+- [X] Restart game issue
+- [X] Your turn sound
+- [X] Score issue
+- [X] Partner score not take in account
+- [X] Excuse issue if fold lose
+- [X] Issue if first color is Excuse
+- [X] Can't play first, color taken
 
 Fixed (24/03/2024):
-[X] Excuse issue if fold win but winner don't have excuse
+- [X] Excuse issue if fold win but winner don't have excuse
 
 In progress:
-[ ] Spectator mode
-[ ] Take small, guard
-[ ] Show who takes what
-[ ] "Join current game" button in maintenance
-[ ] Highlight valid cards
-[ ] Show last fold
-[ ] Change beginner after each game
+- [ ] Spectator mode
+- [ ] Take small, guard
+- [ ] Show who takes what
+- [ ] "Join current game" button in maintenance
+- [ ] Highlight valid cards
+- [ ] Show last fold
+- [ ] Change beginner after each game
 
 # Getting Started with Create React App
 
